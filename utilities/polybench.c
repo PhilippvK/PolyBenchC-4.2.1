@@ -22,6 +22,7 @@
 #ifdef _OPENMP
 # include <omp.h>
 #endif
+#include <malloc.h>
 
 #if defined(POLYBENCH_PAPI)
 # undef POLYBENCH_PAPI
@@ -520,12 +521,13 @@ xmalloc(size_t alloc_sz)
   /* By default, post-pad the arrays. Safe behavior, but likely useless. */
   polybench_inter_array_padding_sz += POLYBENCH_INTER_ARRAY_PADDING_FACTOR;
   size_t padded_sz = alloc_sz + polybench_inter_array_padding_sz;
-  int err = posix_memalign (&ret, 4096, padded_sz);
-  if (! ret || err)
-    {
-      fprintf (stderr, "[PolyBench] posix_memalign: cannot allocate memory");
-      exit (1);
-    }
+  // int err = posix_memalign (&ret, 4096, padded_sz);
+  ret = memalign (4096, padded_sz);
+  // if (! ret || err)
+  //   {
+  //     fprintf (stderr, "[PolyBench] posix_memalign: cannot allocate memory");
+  //     exit (1);
+  //   }
   /* Safeguard: this is invoked only if polybench.c has been compiled
      with inter-array padding support from polybench.h. If so, move
      the starting address of the allocation and return it to the
